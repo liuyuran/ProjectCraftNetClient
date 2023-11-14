@@ -12,3 +12,8 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+.idea/
+cmake-build-debug/
+mineworld.sln.DotSettings
+.vsconfig
+CMakeLists.txt
