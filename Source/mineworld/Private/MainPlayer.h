@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "GameFramework/DefaultPawn.h"
 #include "MainPlayer.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCharacter, Log, All);
 
 UCLASS()
-class AMainPlayer : public ACharacter
+class AMainPlayer : public ADefaultPawn
 {
 	GENERATED_BODY()
 
@@ -28,5 +28,5 @@ public:
 	void Test();
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
 };
+
