@@ -38,6 +38,7 @@ private:
 	EBlock GetBlock(FIntVector Index) const;
 	bool CompareMask(FMask M1, FMask M2) const;
 	int GetTextureIndex(EBlock Block, FVector Normal) const;
+	UMaterialInstanceDynamic* LoadImageAsTexture(const FString& FilePath) const;
 };
 
 

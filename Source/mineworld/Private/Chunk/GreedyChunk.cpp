@@ -3,7 +3,16 @@
 
 #include "GreedyChunk.h"
 
+#include "Engine/VolumeTexture.h"
 #include "Utils/FastNoiseLite.h"
+
+UMaterialInstanceDynamic* AGreedyChunk::LoadImageAsTexture(const FString& FilePath) const
+{
+	UVolumeTexture* MyTexture = Cast<UVolumeTexture>(StaticLoadObject(UVolumeTexture::StaticClass(), nullptr, *FilePath));
+	UMaterialInstanceDynamic* MyMaterialInstance = UMaterialInstanceDynamic::Create(Material, nullptr);
+	MyMaterialInstance->SetTextureParameterValue(FName("TextureImage"), MyTexture);
+	return MyMaterialInstance;
+}
 
 void AGreedyChunk::Setup()
 {
