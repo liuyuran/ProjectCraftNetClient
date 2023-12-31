@@ -3,8 +3,11 @@
 
 #include "ChunkBase.h"
 
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
 #include "Utils/FastNoiseLite.h"
 #include "ProceduralMeshComponent.h"
+#include "Engine/VolumeTexture.h"
 
 
 // Sets default values
@@ -33,9 +36,9 @@ void AChunkBase::BeginPlay()
 	Noise->SetFractalType(FastNoiseLite::FractalType_FBm);
 
 	Setup();
-	
+
 	GenerateHeightMap();
-	
+
 	GenerateMesh();
 
 	UE_LOG(LogTemp, Warning, TEXT("Vertex Count : %d"), VertexCount);
@@ -58,9 +61,43 @@ void AChunkBase::GenerateHeightMap()
 	}
 }
 
+UMaterialInstanceDynamic* AChunkBase::LoadImageAsTexture(const FString& FilePath) const
+{
+	// Represents the entire file in memory.
+	UTexture2D* MyTexture = nullptr;
+	if (TArray64<uint8> RawFileData;
+		FFileHelper::LoadFileToArray(RawFileData, FilePath.GetCharArray().GetData()))
+	{
+		IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+		// Note: PNG format.  Other formats are supported
+		const TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+		if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
+		{
+			if (TArray64<uint8> UncompressedBGRA;
+				ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
+			{
+				// Create the UTexture for rendering
+				MyTexture = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
+				// Fill in the source data from the file
+				void* TextureData = MyTexture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+				FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
+				MyTexture->PlatformData->Mips[0].BulkData.Unlock();
+				// Update the rendering resource from data.
+				MyTexture->UpdateResource();
+			}
+		}
+	}
+	if (!MyTexture) return nullptr;
+	UMaterialInstanceDynamic* MyMaterialInstance = UMaterialInstanceDynamic::Create(Material, Mesh);
+	MyMaterialInstance->ClearParameterValues();
+	MyMaterialInstance->SetTextureParameterValue(FName("Texture"), MyTexture);
+	return MyMaterialInstance;
+}
+
 void AChunkBase::ApplyMesh() const
 {
-	Mesh->SetMaterial(0, Material);
+	Mesh->SetMaterial(0, LoadImageAsTexture("F:/texture.png"));
+	// Mesh->SetMaterial(0, Material);
 	Mesh->CreateMeshSection(
 		0,
 		MeshData.Vertices,
@@ -82,11 +119,11 @@ void AChunkBase::ClearMesh()
 void AChunkBase::ModifyVoxel(const FIntVector Position, const EBlock Block)
 {
 	if (Position.X >= Size || Position.Y >= Size || Position.Z >= Size || Position.X < 0 || Position.Y < 0 || Position.Z < 0) return;
-	
+
 	ModifyVoxelData(Position, Block);
 
 	ClearMesh();
-	
+
 	GenerateMesh();
 
 	ApplyMesh();

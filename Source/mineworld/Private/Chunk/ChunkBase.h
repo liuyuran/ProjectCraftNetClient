@@ -40,7 +40,6 @@ protected:
 	virtual void Generate2DHeightMap(const FVector Position) PURE_VIRTUAL(AChunkBase::Generate2DHeightMap);
 	virtual void Generate3DHeightMap(const FVector Position) PURE_VIRTUAL(AChunkBase::Generate3DHeightMap);
 	virtual void GenerateMesh() PURE_VIRTUAL(AChunkBase::GenerateMesh);
-
 	virtual void ModifyVoxelData(const FIntVector Position, const EBlock Block) PURE_VIRTUAL(AChunkBase::RemoveVoxelData);
 
 	TObjectPtr<UProceduralMeshComponent> Mesh;
@@ -52,4 +51,5 @@ private:
 	void ApplyMesh() const;
 	void ClearMesh();
 	void GenerateHeightMap();
+	UMaterialInstanceDynamic* LoadImageAsTexture(const FString& FilePath) const;
 };
