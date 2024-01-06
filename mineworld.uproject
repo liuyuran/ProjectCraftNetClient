@@ -36,6 +36,13 @@
 		{
 			"Name": "MassGameplay",
 			"Enabled": true
+		},
+		{
+			"Name": "Protobuf",
+			"Enabled": true
 		}
+	],
+	"AdditionalPluginDirectories": [
+		"Source/ThirdParty"
 	]
 }
