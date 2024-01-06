@@ -100,13 +100,57 @@ void ANaiveChunk::CreateFace(const EDirection Direction, const FVector Position)
 	MeshData.Triangles.Append({ VertexCount + 3, VertexCount + 2, VertexCount, VertexCount + 2, VertexCount + 1, VertexCount });
 	MeshData.Normals.Append({Normal, Normal, Normal, Normal});
 	MeshData.Colors.Append({Color, Color, Color, Color});
-	MeshData.UV0.Append({
-		FVector2D(0.33,0.5),
-		FVector2D(0.33,0),
-		FVector2D(0,0),
-		FVector2D(0,0.5)
-	});
-
+	switch (Direction)
+	{
+	case EDirection::Back:// FORWARD?
+		MeshData.UV0.Append({
+			FVector2D(0, 0.5),
+			FVector2D(0.333, 0.5),
+			FVector2D(0.333, 1),
+			FVector2D(0, 1)
+		});
+		break;
+	case EDirection::Right:
+		MeshData.UV0.Append({
+			FVector2D(0.666, 0),
+			FVector2D(1, 0),
+			FVector2D(1, 0.5),
+			FVector2D(0.666, 0.5)
+		});
+		break;
+	case EDirection::Forward: // BACK?
+		MeshData.UV0.Append({
+			FVector2D(0.666, 0.5),
+			FVector2D(1, 0.5),
+			FVector2D(1, 1),
+			FVector2D(0.666, 1),
+		});
+		break;
+	case EDirection::Up:
+		MeshData.UV0.Append({
+			FVector2D(0.333, 0.5),
+			FVector2D(0.666, 0.5),
+			FVector2D(0.666, 1),
+			FVector2D(0.333, 1)
+		});
+		break;
+	case EDirection::Left:
+		MeshData.UV0.Append({
+			FVector2D(0.333, 0),
+			FVector2D(0.666, 0),
+			FVector2D(0.666, 0.5),
+			FVector2D(0.333, 0.5)
+		});
+		break;
+	case EDirection::Down:
+		MeshData.UV0.Append({
+			FVector2D(0, 0),
+			FVector2D(0.333, 0),
+			FVector2D(0.333, 0.5),
+			FVector2D(0, 0.5)
+		});
+		break;
+	}
 	VertexCount += 4;
 }
 
