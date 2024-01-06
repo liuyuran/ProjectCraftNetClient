@@ -84,17 +84,17 @@ class PROTOBUF_EXPORT CachedSize {
   constexpr CachedSize() noexcept : atom_(Scalar{}) {}
   // NOLINTNEXTLINE(google-explicit-constructor)
   constexpr CachedSize(Scalar desired) noexcept : atom_(desired) {}
-#if PROTOBUF_BUILTIN_ATOMIC
-  constexpr CachedSize(const CachedSize& other) = default;
-
-  Scalar Get() const noexcept {
-    return __atomic_load_n(&atom_, __ATOMIC_RELAXED);
-  }
-
-  void Set(Scalar desired) noexcept {
-    __atomic_store_n(&atom_, desired, __ATOMIC_RELAXED);
-  }
-#else
+// #if PROTOBUF_BUILTIN_ATOMIC
+//   constexpr CachedSize(const CachedSize& other) = default;
+//
+//   Scalar Get() const noexcept {
+//     return __atomic_load_n(&atom_, __ATOMIC_RELAXED);
+//   }
+//
+//   void Set(Scalar desired) noexcept {
+//     __atomic_store_n(&atom_, desired, __ATOMIC_RELAXED);
+//   }
+// #else
   CachedSize(const CachedSize& other) noexcept : atom_(other.Get()) {}
   CachedSize& operator=(const CachedSize& other) noexcept {
     Set(other.Get());
@@ -108,14 +108,15 @@ class PROTOBUF_EXPORT CachedSize {
   void Set(Scalar desired) noexcept {
     atom_.store(desired, std::memory_order_relaxed);
   }
-#endif
+// #endif
 
  private:
-#if PROTOBUF_BUILTIN_ATOMIC
-  Scalar atom_;
-#else
+// #if PROTOBUF_BUILTIN_ATOMIC
+//   Scalar atom_;
+// #else
+//   std::atomic<Scalar> atom_;
+// #endif
   std::atomic<Scalar> atom_;
-#endif
 };
 
 class SwapFieldHelper;
