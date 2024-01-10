@@ -6,6 +6,8 @@
 #include "MainPlayer.h"
 // #include "Sockets.h"
 // #include "SocketSubsystem.h"
+#undef verify
+#include "proto/core.pb.h"
 
 ASandboxGameMode::ASandboxGameMode()
 {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+option cc_enable_arenas = true;
+
+message Connect {
+  uint32 client_type = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message ChatAndBroadcast {
+  string msg = 1;
+}
