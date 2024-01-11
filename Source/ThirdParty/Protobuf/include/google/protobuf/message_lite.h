@@ -84,7 +84,6 @@ class PROTOBUF_EXPORT CachedSize {
   constexpr CachedSize() noexcept : atom_(Scalar{}) {}
   // NOLINTNEXTLINE(google-explicit-constructor)
   constexpr CachedSize(Scalar desired) noexcept : atom_(desired) {}
-
   CachedSize(const CachedSize& other) noexcept : atom_(other.Get()) {}
   CachedSize& operator=(const CachedSize& other) noexcept {
     Set(other.Get());

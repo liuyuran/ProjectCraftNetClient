@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
 using System.IO;
 using UnrealBuildTool;
 
@@ -21,36 +22,21 @@ public class mineworld : ModuleRules
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-		string ThridPartyPath = Path.Combine(ModuleDirectory, "../ThirdParty/");
+		var thirdPartyPath = Path.Combine(ModuleDirectory, "../ThirdParty/");
 		
-		if (Target.Platform == UnrealTargetPlatform.Win64)
-		{
-			PublicAdditionalLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotobuf.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotoc.lib"));
-			PublicSystemLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotobuf.lib"));
-			PublicSystemLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotoc.lib"));
+		PublicSystemIncludePaths.AddRange(new string[] {Path.Combine(thirdPartyPath, "Protobuf/include")});
+		
+		PublicSystemLibraryPaths.Add(Path.Combine(thirdPartyPath, "Protobuf/lib/Win64"));
+		var dict = Directory.GetFiles(Path.Combine(thirdPartyPath, "Protobuf/lib/Win64"));
+		foreach (var file in dict) {
+			if (file.EndsWith(".lib")) PublicAdditionalLibraries.Add(file);				
 		}
-        
-        
-		PublicIncludePaths.AddRange(new string[] {Path.Combine(ThridPartyPath, "Protobuf/include")});
-           
-           
-		if (Target.Platform == UnrealTargetPlatform.Win64)
-		{
-			PublicAdditionalLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotobuf.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotoc.lib"));
-			PublicSystemLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotobuf.lib"));
-			PublicSystemLibraries.Add(Path.Combine(ThridPartyPath, "Protobuf", "lib", "Win64", "libprotoc.lib"));
-		}
+		bEnableExceptions = true;
         
 		PublicDefinitions.Add("GOOGLE_PROTOBUF_NO_RTTI=1");
 
 		ShadowVariableWarningLevel = WarningLevel.Off;
 		bEnableUndefinedIdentifierWarnings = false;
-		if (Target.Platform == UnrealTargetPlatform.Win64)
-		{
-			bEnableExceptions = true;
-		}
         
 		PublicDefinitions.Add("_CRT_SECURE_NO_WARNINGS");
 	}

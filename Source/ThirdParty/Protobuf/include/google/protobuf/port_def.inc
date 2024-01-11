@@ -25,6 +25,7 @@
 // This is a textual header with no include guard, because we want to
 // detect/prohibit anytime it is #included twice without a corresponding
 // #undef.
+#undef verify
 
 #ifdef PROTOBUF_PORT_
 #error "port_def.inc included multiple times"
