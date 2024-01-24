@@ -17,10 +17,10 @@ void ANaiveChunk::Generate2DHeightMap(const FVector Position)
 	{
 		for (int y = 0; y < Size; y++)
 		{
-			const float Xpos = x + Position.X;
-			const float ypos = y + Position.Y;
+			const float XPos = x + Position.X;
+			const float YPos = y + Position.Y;
 			
-			const int Height = FMath::Clamp(FMath::RoundToInt((Noise->GetNoise(Xpos, ypos) + 1) * Size / 2), 0, Size);
+			const int Height = FMath::Clamp(FMath::RoundToInt((Noise->GetNoise(XPos, YPos) + 1) * Size / 2), 0, Size);
 
 			for (int z = 0; z < Height; z++)
 			{

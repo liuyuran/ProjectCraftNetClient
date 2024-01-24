@@ -23,6 +23,9 @@ public:
 	UPROPERTY(EditInstanceOnly, Category="World")
 	int DrawDistance = 5;
 
+	UPROPERTY(EditInstanceOnly, Category="World")
+	int FrameRenderLimit = 3;
+
 	UPROPERTY(EditInstanceOnly, Category="Chunk")
 	TObjectPtr<UMaterialInterface> Material;
 	
@@ -41,10 +44,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	int ChunkCount;
+	TMap<FVector, AChunkBase*> Chunks;
 	
-	void Generate3DWorld();
-	void Generate2DWorld();
+	void RenderChunk(int ChunkX, int ChunkY, int Distance, int RenderLimit);
+	void ClearOutOfSightChunks(int ChunkX, int ChunkY, int Distance);
 };

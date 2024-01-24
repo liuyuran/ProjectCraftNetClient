@@ -9,91 +9,78 @@
 // Sets default values
 AChunkWorld::AChunkWorld()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
 	ChunkCount = 0;
 	GenerationType = EGenerationType::GT_3D;
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
 void AChunkWorld::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	switch (GenerationType)
-	{
-	case EGenerationType::GT_3D:
-		Generate3DWorld();
-		break;
-	case EGenerationType::GT_2D:
-		Generate2DWorld();
-		break;
-	default:
-		throw std::invalid_argument("Invalid Generation Type");
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%d Chunks Created"), ChunkCount);
 }
 
-void AChunkWorld::Generate3DWorld()
+void AChunkWorld::RenderChunk(const int ChunkX, const int ChunkY, const int Distance, const int RenderLimit)
 {
-	for (int x = -DrawDistance; x <= DrawDistance; x++)
+	int Limit = 0;
+	for (int x = ChunkX - Distance; x <= ChunkX + Distance; x++)
 	{
-		for (int y = -DrawDistance; y <= DrawDistance; ++y)
+		for (int y = ChunkY - Distance; y <= ChunkY + Distance; ++y)
 		{
-			for (int z = -DrawDistance; z <= DrawDistance; ++z)
+			if (Chunks.Contains(FVector(x, y, 0)) || (RenderLimit > 0 && Limit >= RenderLimit))
 			{
-				auto Transform = FTransform(
-					FRotator::ZeroRotator,
-					FVector(x * Size * 100, y * Size * 100, z * Size * 100),
-					FVector::OneVector
-				);
-
-				const auto Chunk = GetWorld()->SpawnActorDeferred<AChunkBase>(
-					ChunkType,
-					Transform,
-					this
-				);
-
-				Chunk->GenerationType = EGenerationType::GT_3D;
-				Chunk->Frequency = Frequency;
-				Chunk->Material = Material;
-				Chunk->Size = Size;
-
-				UGameplayStatics::FinishSpawningActor(Chunk, Transform);
-
-				ChunkCount++;
+				continue;
 			}
-		}
-	}
-}
-
-void AChunkWorld::Generate2DWorld()
-{
-	for (int x = -DrawDistance; x <= DrawDistance; x++)
-	{
-		for (int y = -DrawDistance; y <= DrawDistance; ++y)
-		{
-			auto transform = FTransform(
+			auto Transform = FTransform(
 				FRotator::ZeroRotator,
 				FVector(x * Size * 100, y * Size * 100, 0),
 				FVector::OneVector
 			);
-
-			const auto chunk = GetWorld()->SpawnActorDeferred<AChunkBase>(
+			const auto Chunk = GetWorld()->SpawnActorDeferred<AChunkBase>(
 				ChunkType,
-				transform,
+				Transform,
 				this
 			);
-
-			chunk->GenerationType = EGenerationType::GT_2D;
-			chunk->Frequency = Frequency;
-			chunk->Material = Material;
-			chunk->Size = Size;
-
-			UGameplayStatics::FinishSpawningActor(chunk, transform);
-
-			ChunkCount++;
+			Chunk->GenerationType = EGenerationType::GT_2D;
+			Chunk->Frequency = Frequency;
+			Chunk->Material = Material;
+			Chunk->Size = Size;
+			UGameplayStatics::FinishSpawningActor(Chunk, Transform);
+			Chunks.Add(FVector(x, y, 0), Chunk);
+			Limit++;
 		}
 	}
+}
+
+void AChunkWorld::ClearOutOfSightChunks(int ChunkX, int ChunkY, int Distance)
+{
+	TArray<UE::Math::TVector<double>> WaitRemove;
+	for (auto& Chunk : Chunks)
+	{
+		if (FMath::Abs(Chunk.Key.X - ChunkX) > Distance || FMath::Abs(Chunk.Key.Y - ChunkY) > Distance)
+		{
+			WaitRemove.Add(Chunk.Key);
+		}
+	}
+	for (auto& Pos: WaitRemove)
+	{
+		AChunkBase* Target = Chunks[Pos];
+		GetWorld()->DestroyActor(Target);
+		Chunks.Remove(Pos);
+	}
+}
+
+void AChunkWorld::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	// Get player position
+	const auto Position = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	const auto PositionScale = Size * 100;
+	const int ChunkX = Position.X / PositionScale;
+	const int ChunkY = Position.Y / PositionScale;
+	// generate chunks around player
+	RenderChunk(ChunkX, ChunkY, 1, -1);
+	RenderChunk(ChunkX, ChunkY, DrawDistance, FrameRenderLimit);
+	ClearOutOfSightChunks(ChunkX, ChunkY, DrawDistance);
 }
