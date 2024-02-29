@@ -17,6 +17,9 @@ class ANaiveChunk final : public AChunkBase
 {
 	GENERATED_BODY()
 
+public:
+	EBlock GetBlockByFaceIndex(int Index);
+	FVector GetBlockPosition(int FaceIndex) const;
 protected:
 	virtual void Setup() override;
 	virtual void Generate2DHeightMap(FVector Position) override;
@@ -26,6 +29,7 @@ protected:
 
 private:
 	TArray<EBlock> Blocks;
+	TMap<int32, int32> FaceToPoint;
 
 	const FVector BlockVertexData[8] = {
 		FVector(100,100,100),

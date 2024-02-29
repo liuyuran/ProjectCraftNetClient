@@ -4,6 +4,8 @@
 #include "MainPlayer.h"
 
 #include "KeyBindUtils.h"
+#include "Chunk/NaiveChunk.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter)
 
@@ -32,14 +34,38 @@ void AMainPlayer::Tick(float DeltaTime)
 void AMainPlayer::Test()
 {
 	UE_LOG(LogCharacter, Display, TEXT("key pressed!"));
+	FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	FVector2D ScreenCenter = ViewportSize / 2.0f;
+	FVector WorldLocation;
+	FVector WorldDirection;
+	UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), ScreenCenter, WorldLocation, WorldDirection);
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetOwner());
+	Params.bReturnFaceIndex = true;
+	GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, WorldLocation + WorldDirection * 10000.0f, ECC_Visibility, Params);
+	if (HitResult.bBlockingHit && HitResult.Distance <= 1000.0f)
+	{
+		if (AActor* TargetActor = HitResult.GetActor(); TargetActor->GetClass() == ANaiveChunk::StaticClass())
+		{
+			ANaiveChunk* TargetChunk = static_cast<ANaiveChunk*>(TargetActor);
+			EBlock Block = TargetChunk->GetBlockByFaceIndex(HitResult.FaceIndex);
+			FVector BlockPosition = TargetChunk->GetBlockPosition(HitResult.FaceIndex);
+			FString BlockName = UEnum::GetValueAsString(Block);
+			UE_LOG(LogTemp, Warning, TEXT("Object %s [%f, %f, %f] is in the center of the screen and within 1000 units."),
+				*BlockName, BlockPosition.X, BlockPosition.Y, BlockPosition.Z);
+		}
+	}
 }
 
 // Called to bind functionality to input
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	FKeyBindUtils::AddAction("InventorySlotOne", EKeys::X, false, false, false);
-	PlayerInputComponent->BindAction("InventorySlotOne", IE_Pressed, this, &AMainPlayer::Test);
+	// FKeyBindUtils::AddAction("InventorySlotOne", EKeys::X, false, false, false);
+	// PlayerInputComponent->BindAction("InventorySlotOne", IE_Pressed, this, &AMainPlayer::Test);
+	FKeyBindUtils::AddAction("InventorySlotTwo", EKeys::LeftMouseButton, false, false, false);
+	PlayerInputComponent->BindAction("InventorySlotTwo", IE_Pressed, this, &AMainPlayer::Test);
 	UE_LOG(LogCharacter, Display, TEXT("key binded!"));
 }
 

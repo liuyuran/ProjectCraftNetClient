@@ -1,1 +1,1 @@
-protoc --cpp_out=./include ./proto/*
+protoc --cpp_out=../../mineworld/Private/Proto ./proto/*

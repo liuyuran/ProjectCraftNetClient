@@ -3,7 +3,14 @@
 
 #include "NaiveChunk.h"
 
+#include "MainPlayer.h"
 #include "Utils/FastNoiseLite.h"
+
+EBlock ANaiveChunk::GetBlockByFaceIndex(const int Index)
+{
+	const int32 BlockIndex = FaceToPoint.FindRef(Index);
+	return Blocks[BlockIndex];
+}
 
 void ANaiveChunk::Setup()
 {
@@ -61,6 +68,7 @@ void ANaiveChunk::Generate3DHeightMap(const FVector Position)
 
 void ANaiveChunk::GenerateMesh()
 {
+	FaceToPoint.Empty();
 	for (int x = 0; x < Size; x++)
 	{
 		for (int y = 0; y < Size; y++)
@@ -95,8 +103,13 @@ void ANaiveChunk::CreateFace(const EDirection Direction, const FVector Position)
 {
 	const auto Color = FColor::MakeRandomColor();
 	const auto Normal = GetNormal(Direction);
-	
+
+	FaceToPoint.Add(MeshData.Vertices.Num(), GetBlockIndex(Position.X, Position.Y, Position.Z));
 	MeshData.Vertices.Append(GetFaceVertices(Direction, Position));
+	for (int i = 0; i < 6; i++)
+	{
+		FaceToPoint.Add(MeshData.Triangles.Num() + i, GetBlockIndex(Position.X, Position.Y, Position.Z));
+	}
 	MeshData.Triangles.Append({ VertexCount + 3, VertexCount + 2, VertexCount, VertexCount + 2, VertexCount + 1, VertexCount });
 	MeshData.Normals.Append({Normal, Normal, Normal, Normal});
 	MeshData.Colors.Append({Color, Color, Color, Color});
@@ -201,7 +214,20 @@ void ANaiveChunk::ModifyVoxelData(const FIntVector Position, const EBlock Block)
 	Blocks[Index] = Block;
 }
 
-int ANaiveChunk::GetBlockIndex(const int X, const int Y, const int Z) const
+int ANaiveChunk::GetBlockIndex(int X, int Y, int Z) const
 {
+	if (X > Size) X = X % Size;
+	if (Y > Size) Y = Y % Size;
+	if (Z > Size) Z = Z % Size;
 	return Z * Size * Size + Y * Size + X;
+}
+
+FVector ANaiveChunk::GetBlockPosition(const int FaceIndex) const
+{
+	// TODO 坐标明显不对
+	const int32 BlockIndex = FaceToPoint.FindRef(FaceIndex);
+	const int32 X = BlockIndex % Size;
+	const int32 Y = (BlockIndex / Size) % Size;
+	const int32 Z = BlockIndex / (Size * Size);
+	return FVector(X, Y, Z);
 }

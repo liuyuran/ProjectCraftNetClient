@@ -61,15 +61,8 @@ void AChunkBase::GenerateHeightMap()
 	}
 }
 
-TMap<FString, UMaterialInstanceDynamic*> MaterialCache = TMap<FString, UMaterialInstanceDynamic*>();
-
 UMaterialInstanceDynamic* AChunkBase::LoadImageAsTexture(const FString& FilePath) const
 {
-	// Represents the entire file in memory.
-	if (MaterialCache.Contains(FilePath))
-	{
-		return MaterialCache[FilePath];
-	}
 	UTexture2D* MyTexture = nullptr;
 	if (TArray64<uint8> RawFileData;
 		FFileHelper::LoadFileToArray(RawFileData, FilePath.GetCharArray().GetData()))
@@ -97,7 +90,6 @@ UMaterialInstanceDynamic* AChunkBase::LoadImageAsTexture(const FString& FilePath
 	UMaterialInstanceDynamic* MyMaterialInstance = UMaterialInstanceDynamic::Create(Material, Mesh);
 	MyMaterialInstance->ClearParameterValues();
 	MyMaterialInstance->SetTextureParameterValue(FName("Texture"), MyTexture);
-	MaterialCache.Add(FilePath, MyMaterialInstance);
 	return MyMaterialInstance;
 }
 
