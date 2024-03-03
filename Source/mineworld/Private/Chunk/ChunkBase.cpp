@@ -41,8 +41,6 @@ void AChunkBase::BeginPlay()
 
 	GenerateMesh();
 
-	UE_LOG(LogTemp, Warning, TEXT("Vertex Count : %d"), VertexCount);
-
 	ApplyMesh();
 }
 

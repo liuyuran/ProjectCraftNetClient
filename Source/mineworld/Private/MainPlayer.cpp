@@ -50,10 +50,10 @@ void AMainPlayer::Test()
 		{
 			ANaiveChunk* TargetChunk = static_cast<ANaiveChunk*>(TargetActor);
 			EBlock Block = TargetChunk->GetBlockByFaceIndex(HitResult.FaceIndex);
-			FVector BlockPosition = TargetChunk->GetBlockPosition(HitResult.FaceIndex);
+			FVector BlockPosition = TargetChunk->GetBlockPosition(HitResult.FaceIndex) + TargetActor->GetActorLocation() / 100;
 			FString BlockName = UEnum::GetValueAsString(Block);
-			UE_LOG(LogTemp, Warning, TEXT("Object %s [%f, %f, %f] is in the center of the screen and within 1000 units."),
-				*BlockName, BlockPosition.X, BlockPosition.Y, BlockPosition.Z);
+			UE_LOG(LogTemp, Warning, TEXT("Object %s [%d] [%f, %f, %f] is in the center of the screen and within 1000 units."),
+				*BlockName, HitResult.FaceIndex, BlockPosition.X, BlockPosition.Y, BlockPosition.Z);
 		}
 	}
 }

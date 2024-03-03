@@ -26,19 +26,18 @@ void ANaiveChunk::Generate2DHeightMap(const FVector Position)
 		{
 			const float XPos = x + Position.X;
 			const float YPos = y + Position.Y;
-			
+
 			const int Height = FMath::Clamp(FMath::RoundToInt((Noise->GetNoise(XPos, YPos) + 1) * Size / 2), 0, Size);
 
 			for (int z = 0; z < Height; z++)
 			{
 				Blocks[GetBlockIndex(x,y,z)] = EBlock::Stone;
 			}
-
+			
 			for (int z = Height; z < Size; z++)
 			{
 				Blocks[GetBlockIndex(x,y,z)] = EBlock::Air;
 			}
-			
 		}
 	}
 }
@@ -106,10 +105,11 @@ void ANaiveChunk::CreateFace(const EDirection Direction, const FVector Position)
 
 	FaceToPoint.Add(MeshData.Vertices.Num(), GetBlockIndex(Position.X, Position.Y, Position.Z));
 	MeshData.Vertices.Append(GetFaceVertices(Direction, Position));
-	for (int i = 0; i < 6; i++)
-	{
-		FaceToPoint.Add(MeshData.Triangles.Num() + i, GetBlockIndex(Position.X, Position.Y, Position.Z));
-	}
+	// 一个面对应两个三角形
+	const auto TruthPos = Position / 100;
+	FaceToPoint.Add(MeshData.Triangles.Num() / 3, GetBlockIndex(TruthPos.X, TruthPos.Y, TruthPos.Z));
+	FaceToPoint.Add(MeshData.Triangles.Num() / 3 + 1, GetBlockIndex(TruthPos.X, TruthPos.Y, TruthPos.Z));
+	// 实际填入三角形顶点数据，这里是三个点确定一个三角形，所以上面必须除三
 	MeshData.Triangles.Append({ VertexCount + 3, VertexCount + 2, VertexCount, VertexCount + 2, VertexCount + 1, VertexCount });
 	MeshData.Normals.Append({Normal, Normal, Normal, Normal});
 	MeshData.Colors.Append({Color, Color, Color, Color});
