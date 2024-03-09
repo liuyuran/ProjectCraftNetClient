@@ -18,7 +18,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "开始菜单", meta = (DisplayName = "开始游戏"))
 	void StartGame();
 	UFUNCTION(BlueprintCallable, Category = "开始菜单", meta = (DisplayName = "技术支持"))
-	static void Support();
+	void Support();
 	UFUNCTION(BlueprintCallable, Category = "开始菜单", meta = (DisplayName = "保存设置"))
 	void SetSetting(FString Key, FString Value);
 
