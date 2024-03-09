@@ -1,6 +1,3 @@
-
-
-
 #include "StartMenuFunction.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -8,17 +5,12 @@
 // Sets default values for this component's properties
 UStartMenuFunction::UStartMenuFunction()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UStartMenuFunction::StartGame()
 {
-	const UWorld* World = GetWorld();
-	UGameplayStatics::OpenLevel(World, "MainGame");
+	UGameplayStatics::OpenLevel(this, "MainGame");
 }
 
 void UStartMenuFunction::Support()
@@ -36,9 +28,6 @@ void UStartMenuFunction::SetSetting(const FString Key, const FString Value)
 void UStartMenuFunction::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
@@ -46,7 +35,5 @@ void UStartMenuFunction::BeginPlay()
 void UStartMenuFunction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
