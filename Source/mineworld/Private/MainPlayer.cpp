@@ -3,17 +3,19 @@
 
 #include "MainPlayer.h"
 
-#include "KeyBindUtils.h"
+#include "Blueprint/UserWidget.h"
 #include "Chunk/NaiveChunk.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter)
 
 // Sets default values
-AMainPlayer::AMainPlayer()
+AMainPlayer::AMainPlayer(): bIsPaused(false)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	static ConstructorHelpers::FClassFinder<UUserWidget> AssetFile(TEXT("/Game/PauseHUD"));
+	PauseWidgetClass = AssetFile.Class;
 }
 
 // Called when the game starts or when spawned
@@ -21,6 +23,13 @@ void AMainPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogCharacter, Display, TEXT("main charactor loaded!"));
+}
+
+void AMainPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	UE_LOG(LogCharacter, Display, TEXT("main charactor unloaded!"));
+	
 }
 
 // Called every frame
@@ -62,9 +71,6 @@ void AMainPlayer::Test()
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	// FKeyBindUtils::AddAction("InventorySlotOne", EKeys::X, false, false, false);
-	// PlayerInputComponent->BindAction("InventorySlotOne", IE_Pressed, this, &AMainPlayer::Test);
-	FKeyBindUtils::AddAction("InventorySlotTwo", EKeys::LeftMouseButton, false, false, false);
 	PlayerInputComponent->BindAction("InventorySlotTwo", IE_Pressed, this, &AMainPlayer::Test);
 	UE_LOG(LogCharacter, Display, TEXT("key binded!"));
 }

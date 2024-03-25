@@ -22,7 +22,7 @@ void FKeyBindUtils::AddAction(const FName Name, const FKey& Key, const bool With
 	ActionMap.bCtrl = WithCtrl;
 	ActionMap.bShift = WithShift;
 	ActionMap.Key = Key;
-	UInputSettings::GetInputSettings()->AddActionMapping(ActionMap);
+	UInputSettings::GetInputSettings()->AddActionMapping(ActionMap, true);
 }
 
 void FKeyBindUtils::AddAxisAction(const FName Name, const FKey& Key)

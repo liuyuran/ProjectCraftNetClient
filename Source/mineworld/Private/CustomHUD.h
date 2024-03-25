@@ -1,18 +1,15 @@
-
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "InGameHUD.generated.h"
+#include "CustomHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AAInGameHUD : public AHUD
+class ACustomHUD : public AHUD
 {
 	GENERATED_BODY()
-public:
-	AAInGameHUD();
+	
 };

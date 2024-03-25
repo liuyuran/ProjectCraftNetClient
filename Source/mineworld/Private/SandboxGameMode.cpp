@@ -3,11 +3,14 @@
 
 #include "SandboxGameMode.h"
 
+#include "CustomHUD.h"
+#include "KeyBindUtils.h"
 #include "MainPlayer.h"
 
 ASandboxGameMode::ASandboxGameMode()
 {
 	DefaultPawnClass = AMainPlayer::StaticClass();
+	HUDClass = ACustomHUD::StaticClass();
 }
 
 void ASandboxGameMode::BeginPlay()
