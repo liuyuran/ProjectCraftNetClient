@@ -53,7 +53,7 @@ void AChunkWorld::RenderChunk(const int ChunkX, const int ChunkY, const int Dist
 	}
 }
 
-void AChunkWorld::ClearOutOfSightChunks(int ChunkX, int ChunkY, int Distance)
+void AChunkWorld::ClearOutOfSightChunks(const int ChunkX, const int ChunkY, const int Distance)
 {
 	TArray<UE::Math::TVector<double>> WaitRemove;
 	for (auto& Chunk : Chunks)

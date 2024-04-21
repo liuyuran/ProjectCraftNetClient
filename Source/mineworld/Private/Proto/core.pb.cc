@@ -29,7 +29,7 @@ inline constexpr Connect::Impl_::Impl_(
         password_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        client_type_{0u},
+        client_type_{0},
         _cached_size_{0} {}
 
 template <typename>
@@ -107,7 +107,7 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 const char descriptor_table_protodef_proto_2fcore_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
     "\n\020proto/core.proto\"B\n\007Connect\022\023\n\013client_"
-    "type\030\001 \001(\r\022\020\n\010username\030\002 \001(\t\022\020\n\010password"
+    "type\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\020\n\010password"
     "\030\003 \001(\t\"\037\n\020ChatAndBroadcast\022\013\n\003msg\030\001 \001(\tB"
     "\003\370\001\001b\006proto3"
 };
@@ -210,7 +210,7 @@ PROTOBUF_NOINLINE void Connect::Clear() {
 
   _impl_.username_.ClearToEmpty();
   _impl_.password_.ClearToEmpty();
-  _impl_.client_type_ = 0u;
+  _impl_.client_type_ = 0;
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -237,7 +237,7 @@ const ::_pbi::TcParseTable<2, 3, 0, 32, 2> Connect::_table_ = {
     ::_pbi::TcParser::GenericFallback,  // fallback
   }, {{
     {::_pbi::TcParser::MiniParse, {}},
-    // uint32 client_type = 1;
+    // int32 client_type = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Connect, _impl_.client_type_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(Connect, _impl_.client_type_)}},
     // string username = 2;
@@ -249,9 +249,9 @@ const ::_pbi::TcParseTable<2, 3, 0, 32, 2> Connect::_table_ = {
   }}, {{
     65535, 65535
   }}, {{
-    // uint32 client_type = 1;
+    // int32 client_type = 1;
     {PROTOBUF_FIELD_OFFSET(Connect, _impl_.client_type_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
     // string username = 2;
     {PROTOBUF_FIELD_OFFSET(Connect, _impl_.username_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
@@ -275,11 +275,11 @@ const ::_pbi::TcParseTable<2, 3, 0, 32, 2> Connect::_table_ = {
   ::uint32_t cached_has_bits = 0;
   (void)cached_has_bits;
 
-  // uint32 client_type = 1;
+  // int32 client_type = 1;
   if (this->_internal_client_type() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
-        1, this->_internal_client_type(), target);
+    target = ::google::protobuf::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<1>(
+            stream, this->_internal_client_type(), target);
   }
 
   // string username = 2;
@@ -327,9 +327,9 @@ const ::_pbi::TcParseTable<2, 3, 0, 32, 2> Connect::_table_ = {
                                     this->_internal_password());
   }
 
-  // uint32 client_type = 1;
+  // int32 client_type = 1;
   if (this->_internal_client_type() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
         this->_internal_client_type());
   }
 

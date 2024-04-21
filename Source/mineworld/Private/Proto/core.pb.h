@@ -240,14 +240,14 @@ class Connect final :
   std::string* _internal_mutable_password();
 
   public:
-  // uint32 client_type = 1;
+  // int32 client_type = 1;
   void clear_client_type() ;
-  ::uint32_t client_type() const;
-  void set_client_type(::uint32_t value);
+  ::int32_t client_type() const;
+  void set_client_type(::int32_t value);
 
   private:
-  ::uint32_t _internal_client_type() const;
-  void _internal_set_client_type(::uint32_t value);
+  ::int32_t _internal_client_type() const;
+  void _internal_set_client_type(::int32_t value);
 
   public:
   // @@protoc_insertion_point(class_scope:Connect)
@@ -275,7 +275,7 @@ class Connect final :
                               ::google::protobuf::Arena* arena, const Impl_& from);
     ::google::protobuf::internal::ArenaStringPtr username_;
     ::google::protobuf::internal::ArenaStringPtr password_;
-    ::uint32_t client_type_;
+    ::int32_t client_type_;
     mutable ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -480,24 +480,24 @@ class ChatAndBroadcast final :
 
 // Connect
 
-// uint32 client_type = 1;
+// int32 client_type = 1;
 inline void Connect::clear_client_type() {
   PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
-  _impl_.client_type_ = 0u;
+  _impl_.client_type_ = 0;
 }
-inline ::uint32_t Connect::client_type() const {
+inline ::int32_t Connect::client_type() const {
   // @@protoc_insertion_point(field_get:Connect.client_type)
   return _internal_client_type();
 }
-inline void Connect::set_client_type(::uint32_t value) {
+inline void Connect::set_client_type(::int32_t value) {
   _internal_set_client_type(value);
   // @@protoc_insertion_point(field_set:Connect.client_type)
 }
-inline ::uint32_t Connect::_internal_client_type() const {
+inline ::int32_t Connect::_internal_client_type() const {
   PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
   return _impl_.client_type_;
 }
-inline void Connect::_internal_set_client_type(::uint32_t value) {
+inline void Connect::_internal_set_client_type(::int32_t value) {
   PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
   ;
   _impl_.client_type_ = value;

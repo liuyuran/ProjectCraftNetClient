@@ -1,0 +1,58 @@
+syntax = "proto3";
+option cc_enable_arenas = true;
+
+message ServerStatus {
+  string version = 1;
+  string name = 2;
+  uint64 memoryTotal = 3;
+  uint64 memoryUsed = 4;
+  int64 maxPlayers = 5;
+  int64 onlinePlayers = 6;
+  int64 tps = 7;
+  uint32 ping = 8;
+}
+
+message BlockDefineItem {
+  int64 block_id = 1;
+  string block_key = 2;
+  string material = 3;
+}
+
+message BlockDefine {
+  repeated BlockDefineItem items = 1;
+}
+
+message BlockData {
+  int64 block_id = 1;
+  int64 sub_id = 2;
+}
+
+message ChunkData {
+  int32 x = 1;
+  int32 y = 2;
+  int32 z = 3;
+  int64 worldId = 4;
+  repeated BlockData blocks = 5;
+}
+
+message PlayerItem {
+  int64 id = 1;
+  string name = 2;
+  uint32 ping = 3;
+}
+
+message OnlineList {
+  repeated PlayerItem players = 1;
+}
+
+message BlockChange {
+  int32 chunk_x = 1;
+  int32 chunk_y = 2;
+  int32 chunk_z = 3;
+  int32 block_x = 4;
+  int32 block_y = 5;
+  int32 block_z = 6;
+  int32 change_type = 7;
+  int64 block_id = 8;
+  int64 sub_id = 9;
+}

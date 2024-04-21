@@ -2,7 +2,7 @@ syntax = "proto3";
 option cc_enable_arenas = true;
 
 message Connect {
-  uint32 client_type = 1;
+  int32 client_type = 1; // 1: 正常客户端, 2: 命令行客户端
   string username = 2;
   string password = 3;
 }

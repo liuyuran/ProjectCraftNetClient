@@ -1,0 +1,30 @@
+syntax = "proto3";
+option cc_enable_arenas = true;
+
+message PlayerMove {
+  int32 chunk_x = 1;
+  int32 chunk_y = 2;
+  int32 chunk_z = 3;
+  float x = 4;
+  float y = 5;
+  float z = 6;
+  float yaw = 7;
+  float pitch = 8;
+  float head_yaw = 9;
+  uint32 player_id = 10;
+}
+
+message PlayerControlBlock {
+  int32 type = 1;
+  int32 chunk_x = 2;
+  int32 chunk_y = 3;
+  int32 chunk_z = 4;
+  int32 block_x = 5;
+  int32 block_y = 6;
+  int32 block_z = 7;
+}
+
+message PlayerControlEntity {
+  int32 type = 1;
+  int64 target_id = 2;
+}
