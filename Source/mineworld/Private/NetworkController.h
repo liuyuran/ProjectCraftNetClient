@@ -2,6 +2,14 @@
 
 #include "CoreMinimal.h"
 
+class FNetworkControllerReceiver final : FRunnable
+{
+public:
+	FSocket* Socket;
+	virtual uint32 Run() override;
+	static void OnTcpReceiveMessage(const uint8* Buffer, size_t Len);
+};
+
 /**
  * 网络单例类
  */
@@ -25,5 +33,7 @@ protected:
 private:
 	bool bConnected;
 	FSocket* Socket;
+	FNetworkControllerReceiver* Receiver;
+	FRunnableThread* Thread;
 	FNetworkController();
 };

@@ -9,6 +9,30 @@ FNetworkController::FNetworkController()
 {
 	Socket = nullptr;
 	bConnected = false;
+	Receiver = new FNetworkControllerReceiver();
+	Thread = nullptr;
+}
+
+void FNetworkControllerReceiver::OnTcpReceiveMessage(const uint8* Buffer, size_t Len)
+{
+	UE_LOG(LogTemp, Error, TEXT("收到服务器消息"));
+}
+
+uint32 FNetworkControllerReceiver::Run()
+{
+	while (Socket != nullptr)
+	{
+		if (Socket->Wait(ESocketWaitConditions::WaitForRead, FTimespan::FromSeconds(3)))
+		{
+			uint8 Buffer[1024];
+			if (Socket == nullptr) return 1;
+			if (int32 Size = 0; Socket->Recv(Buffer, sizeof(Buffer), Size))
+			{
+				OnTcpReceiveMessage(Buffer, Size);
+			}
+		}
+	}
+	return 1;
 }
 
 void FNetworkController::ConnectToServer(const TCHAR* Host, const int Port)
@@ -31,6 +55,13 @@ void FNetworkController::ConnectToServer(const TCHAR* Host, const int Port)
 	}
 	Socket->SetNoDelay(true);
 	Socket->SetNonBlocking(false);
+	if (Thread != nullptr)
+	{
+		Thread->Kill(false);
+		delete Thread;
+	}
+	Receiver->Socket = Socket;
+	Thread = FRunnableThread::Create(reinterpret_cast<FRunnable*>(Receiver), TEXT("TcpReceiveThread"), 0, TPri_Normal);
 	Login(TEXT("kamoeth"), TEXT("123456"));
 	bConnected = true;
 }
@@ -44,6 +75,13 @@ void FNetworkController::Destroy()
 
 void FNetworkController::Disconnect()
 {
+	if (Thread != nullptr)
+	{
+		Thread->Kill(false);
+		Receiver->Socket = nullptr;
+		delete Thread;
+		Thread = nullptr;
+	}
 	if (bConnected)
 	{
 		SendMsg(105, nullptr, 0);
