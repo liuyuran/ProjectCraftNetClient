@@ -7,7 +7,7 @@ class FNetworkControllerReceiver final : FRunnable
 public:
 	FSocket* Socket;
 	virtual uint32 Run() override;
-	static void OnTcpReceiveMessage(const uint8* Buffer, size_t Len);
+	static void OnTcpReceiveMessage(int Type, const uint8* Buffer, size_t Len);
 };
 
 /**

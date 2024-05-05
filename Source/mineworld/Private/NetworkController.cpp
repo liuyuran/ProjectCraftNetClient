@@ -13,22 +13,73 @@ FNetworkController::FNetworkController()
 	Thread = nullptr;
 }
 
-void FNetworkControllerReceiver::OnTcpReceiveMessage(const uint8* Buffer, size_t Len)
+void FNetworkControllerReceiver::OnTcpReceiveMessage(const int Type, const uint8* Buffer, size_t Len)
 {
-	UE_LOG(LogTemp, Error, TEXT("收到服务器消息"));
+	UE_LOG(LogTemp, Error, TEXT("收到服务器消息: %d"), Type);
 }
 
 uint32 FNetworkControllerReceiver::Run()
 {
+	uint8 Bytes[1024];
+	std::list<uint8> MsgBuffer = {};
+	bool NewPack = true;
+	uint32 PackLen = 0;
+	uint32 PackType = 0;
+	int32 Size = 0;
 	while (Socket != nullptr)
 	{
 		if (Socket->Wait(ESocketWaitConditions::WaitForRead, FTimespan::FromSeconds(3)))
 		{
-			uint8 Buffer[1024];
 			if (Socket == nullptr) return 1;
-			if (int32 Size = 0; Socket->Recv(Buffer, sizeof(Buffer), Size))
+			for (int i = 0; i < 1024; i++)
 			{
-				OnTcpReceiveMessage(Buffer, Size);
+				Bytes[i] = 0;
+			}
+			if (Size = 0; Socket->Recv(Bytes, sizeof(Bytes), Size))
+			{
+				if (Size == 0) continue;
+			}
+			if (NewPack) {
+				uint8 Tmp[4];
+				// 读取包长度
+				Tmp[0] = Bytes[3];
+				Tmp[1] = Bytes[2];
+				Tmp[2] = Bytes[1];
+				Tmp[3] = Bytes[0];
+				PackLen = Tmp[0] << 24 | Tmp[1] << 16 | Tmp[2] << 8 | Tmp[3];
+				// 读取包类型
+				Tmp[0] = Bytes[7];
+				Tmp[1] = Bytes[6];
+				Tmp[2] = Bytes[5];
+				Tmp[3] = Bytes[4];
+				PackType = Tmp[0] << 24 | Tmp[1] << 16 | Tmp[2] << 8 | Tmp[3];
+				NewPack = false;
+			}
+			// 读取字节直到抵达第一个字节所标注的长度，下一次读取需要剔除所有的0
+			for (int i = 0; i < Size; i++) {
+				MsgBuffer.push_back(Bytes[i]);
+				if (MsgBuffer.size() < PackLen + 8) continue;
+				NewPack = true;
+                
+				// 剔除前八个字节
+				for (int j = 0; j < 8; j++) {
+					MsgBuffer.pop_front();
+				}
+
+				uint8* Msg = new uint8[MsgBuffer.size()];
+				for (int j = 0; j < MsgBuffer.size(); j++) {
+					Msg[j] = MsgBuffer.front();
+					MsgBuffer.pop_front();
+				}
+				OnTcpReceiveMessage(PackType, Msg, MsgBuffer.size());
+				delete[] Msg;
+				MsgBuffer.clear();
+				// 把剩下的数据塞进去
+				for (int j = i + 1; j < Size; j++) {
+					MsgBuffer.push_back(Bytes[j]);
+				}
+
+				break;
 			}
 		}
 	}
