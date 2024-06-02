@@ -13,9 +13,68 @@ FNetworkController::FNetworkController()
 	Thread = nullptr;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void FNetworkControllerReceiver::OnTcpReceiveMessage(const int Type, const uint8* Buffer, size_t Len)
 {
-	UE_LOG(LogTemp, Error, TEXT("收到服务器消息: %d"), Type);
+	UE_LOG(LogTemp, VeryVerbose, TEXT("收到服务器消息: %d"), Type);
+	switch (static_cast<EPackType>(Type))
+	{
+	case ShutdownPack:
+		// TODO 服务器关闭，退出登录
+		break;
+	case ConnectPack:
+		{
+			// 登录成功，获取区块数据
+			for (int x = -3; x <= 3; x++)
+			{
+				for (int y = -3; y <= 3; y++)
+				{
+					for (int z = -3; z <= 3; z++)
+					{
+						Controller->FetchChunkData(0, x, y, z);
+					}
+				}
+			}
+			break;
+		}
+	case BlockDefinePack:
+		{
+			BlockDefine BlockDefine;
+			BlockDefine.ParseFromArray(Buffer, Len);
+			// 添加到全局变量
+			const int Length = BlockDefine.items_size();
+			for (int i = 0; i < Length; i++)
+			{
+				BlockDefineItem Item = BlockDefine.items(i);
+			}
+			break;
+		}
+	case ChatPack:
+		break;
+	case PingPack:
+		break;
+	case ServerStatusPack:
+		break;
+	case ChunkPack:
+		{
+			// 获取World实例，并将数据注入其中
+			break;
+		}
+	case ControlBlockPack:
+		break;
+	case ControlEntityPack:
+		break;
+	case MovePack:
+		break;
+	case OnlineListPack:
+		break;
+	case DisconnectPack:
+		break;
+	case BlockChangePack:
+		break;
+	default:
+		break;
+	}
 }
 
 uint32 FNetworkControllerReceiver::Run()
@@ -39,7 +98,8 @@ uint32 FNetworkControllerReceiver::Run()
 			{
 				if (Size == 0) continue;
 			}
-			if (NewPack) {
+			if (NewPack)
+			{
 				uint8 Tmp[4];
 				// 读取包长度
 				Tmp[0] = Bytes[3];
@@ -56,18 +116,21 @@ uint32 FNetworkControllerReceiver::Run()
 				NewPack = false;
 			}
 			// 读取字节直到抵达第一个字节所标注的长度，下一次读取需要剔除所有的0
-			for (int i = 0; i < Size; i++) {
+			for (int i = 0; i < Size; i++)
+			{
 				MsgBuffer.push_back(Bytes[i]);
 				if (MsgBuffer.size() < PackLen + 8) continue;
 				NewPack = true;
-                
+
 				// 剔除前八个字节
-				for (int j = 0; j < 8; j++) {
+				for (int j = 0; j < 8; j++)
+				{
 					MsgBuffer.pop_front();
 				}
 
 				uint8* Msg = new uint8[MsgBuffer.size()];
-				for (int j = 0; j < MsgBuffer.size(); j++) {
+				for (int j = 0; j < MsgBuffer.size(); j++)
+				{
 					Msg[j] = MsgBuffer.front();
 					MsgBuffer.pop_front();
 				}
@@ -75,7 +138,8 @@ uint32 FNetworkControllerReceiver::Run()
 				delete[] Msg;
 				MsgBuffer.clear();
 				// 把剩下的数据塞进去
-				for (int j = i + 1; j < Size; j++) {
+				for (int j = i + 1; j < Size; j++)
+				{
 					MsgBuffer.push_back(Bytes[j]);
 				}
 
@@ -112,6 +176,7 @@ void FNetworkController::ConnectToServer(const TCHAR* Host, const int Port)
 		delete Thread;
 	}
 	Receiver->Socket = Socket;
+	Receiver->Controller = this;
 	Thread = FRunnableThread::Create(reinterpret_cast<FRunnable*>(Receiver), TEXT("TcpReceiveThread"), 0, TPri_Normal);
 	Login(TEXT("kamoeth"), TEXT("123456"));
 	bConnected = true;
