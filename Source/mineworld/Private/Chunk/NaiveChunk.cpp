@@ -3,6 +3,8 @@
 
 #include "NaiveChunk.h"
 
+#include <stdexcept>
+
 #include "MainPlayer.h"
 #include "Utils/FastNoiseLite.h"
 

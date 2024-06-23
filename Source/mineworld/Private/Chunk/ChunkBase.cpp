@@ -3,6 +3,8 @@
 
 #include "ChunkBase.h"
 
+#include <stdexcept>
+
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "Utils/FastNoiseLite.h"
@@ -76,9 +78,9 @@ UMaterialInstanceDynamic* AChunkBase::LoadImageAsTexture(const FString& FilePath
 				// Create the UTexture for rendering
 				MyTexture = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
 				// Fill in the source data from the file
-				void* TextureData = MyTexture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+				void* TextureData = MyTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 				FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
-				MyTexture->PlatformData->Mips[0].BulkData.Unlock();
+				MyTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
 				// Update the rendering resource from data.
 				MyTexture->UpdateResource();
 			}
